@@ -102,14 +102,11 @@ Open `http://localhost:3000` in your browser to view the application.
 
 ```text
 Munim-AI-Website/
-├── public/                 # Static assets & icons
-├── src/
-│   ├── components/         # UI cards, charts, audio briefings & Ask MunimAI assistant
-│   ├── pages/ (or app/)    # Overview, Legal & Invoices, Credit & Loans, Shop-Floor Ops, Tax & GST
-│   ├── data/               # Workspace models, tax rules & sample MSME datasets
-│   └── utils/              # Financial calculators, GST/TDS logic & speech synthesis helpers
-├── package.json
-└── README.md
+├── index.html      # Main landing page, UI cards & MSME workspace layout
+├── style.css       # Styling, responsive layout & visual themes
+├── script.js       # Financial calculators, GST/TDS logic & Ask MunimAI assistant
+├── page.tsx        # React / Next.js page component version
+└── README.md       # Project documentation
 ```
 
 ---
