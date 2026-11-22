@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MunimAI - MSME Co-Pilot</title>
+  <style>
+    :root{--blue:#1d4ed8;--green:#059669;--amber:#d97706;--red:#dc2626;--ink:#0f172a;--line:#e2e8f0;--canvas:#f8fafc}
+    *{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.45 Inter,Arial,sans-serif}
+    button,input,select{font:inherit}.shell{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
+    aside{background:#fff;border-right:1px solid var(--line);padding:22px 16px}.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;color:var(--ink)}
+    .mark{display:grid;width:38px;height:38px;place-items:center;border-radius:10px;background:#eff6ff;color:var(--blue);font-size:25px}
+    nav{display:grid;gap:6px;margin-top:30px}.nav-btn{border:0;border-radius:8px;background:transparent;color:#64748b;text-align:left;padding:10px 12px;cursor:pointer}
+    .nav-btn.active{background:#eff6ff;color:var(--blue);font-weight:700}
+    main{min-width:0}.topbar{position:sticky;top:0;z-index:3;height:64px;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:0 28px;border-bottom:1px solid var(--line);background:#fff}
+    .content{padding:28px}.heading{display:flex;justify-content:space-between;align-items:center}.heading h1{margin:0;font-size:24px}.heading p{margin:5px 0 0;color:#64748b}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px}.card,.panel{border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 4px 16px #0f172a08}
+    .card{padding:16px}.card small,.panel small{display:block;color:#64748b}.card strong{display:block;margin:12px 0 8px;font-size:20px}.listen{border:0;border-radius:6px;background:#eff6ff;color:var(--blue);padding:7px 9px;cursor:pointer}
+    .alert{display:flex;justify-content:space-between;align-items:center;margin-top:12px;border:1px solid #fecaca;border-radius:9px;background:#fff;color:var(--red);padding:14px}.alert p{margin:3px 0 0}
+    .lower{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:12px}.panel{padding:16px}.panel h2{margin:0;font-size:16px}.activity{display:grid;gap:9px;margin-top:12px}.activity div{display:flex;justify-content:space-between;border-bottom:1px solid #f1f5f9;padding:5px 0}
+    .fab{position:fixed;right:24px;bottom:24px;border:0;border-radius:24px;background:var(--blue);color:#fff;padding:10px 16px 10px 10px;box-shadow:0 8px 24px #1d4ed838;cursor:pointer}.chat{position:fixed;right:24px;bottom:82px;width:min(390px,calc(100vw - 30px));height:520px;display:none;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 18px 55px #0f172a24}.chat.open{display:flex}.chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px;border-bottom:1px solid var(--line)}
+    .messages{flex:1;overflow:auto;padding:12px;background:#fafbfd}.bubble{max-width:85%;margin:6px 0;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff}.bubble.user{margin-left:auto;background:var(--blue);color:#fff}.compose{display:flex;gap:7px;padding:9px;border-top:1px solid var(--line)}.compose input{flex:1;min-width:0;border:1px solid var(--line);border-radius:7px;padding:9px}.compose button{border:0;border-radius:7px;background:var(--blue);color:#fff;padding:9px}
+    .voice-btn,.reset{border:1px solid var(--line);border-radius:7px;background:#fff;padding:8px 10px;cursor:pointer}.reset{color:#64748b}.tab-view{display:none}.tab-view.active{display:block}.tax-row{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #f1f5f9;padding:12px 0}.tag{border-radius:12px;padding:3px 8px;font-size:12px}.tag.green{background:#ecfdf5;color:var(--green)}.tag.red{background:#fef2f2;color:var(--red)}
+    @media(max-width:900px){.shell{grid-template-columns:1fr}.shell aside{display:none}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lower{grid-template-columns:1fr}.topbar{padding:0 14px}.content{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside><div class="brand"><span class="mark">₹</span><span>MunimAI</span></div><nav id="nav"></nav><button class="reset" id="reset" style="margin-top:24px;width:100%">Reset Demo Data</button></aside>
+    <main><header class="topbar"><button class="voice-btn" id="testVoice">Test Voice</button><button class="voice-btn" id="stopVoice">Stop Speaking</button></header>
+      <div class="content">
+        <section class="tab-view active" data-tab="Overview"><div class="heading"><div><h1>Good morning, Ravi</h1><p>Here is today's financial pulse.</p></div></div><div class="grid" id="kpis"></div><div class="alert" id="crunch"></div><div class="lower"><div class="panel"><h2>Cash-flow outlook</h2><div style="height:150px;margin-top:12px;border-radius:8px;background:linear-gradient(180deg,#eff6ff,#fff)" aria-label="Projected cash-flow chart"></div></div><div class="panel"><h2>Recent activity</h2><div class="activity" id="activity"></div></div></div></section>
+        <section class="tab-view" data-tab="Tax"><div class="heading"><div><h1>Tax & GST</h1><p>November 2026 · Sri Balaji Precision Components Pvt Ltd</p></div></div><div class="grid" id="taxKpis"></div><div class="panel" style="margin-top:12px"><h2>ITC Reconciliation</h2><div id="itc"></div></div></section>
+        <section class="tab-view" data-tab="Legal"><div class="heading"><div><h1>Legal & Invoices</h1><p>Section 43B(h) and buyer payment shield</p></div></div><div class="panel" style="margin-top:18px" id="invoiceList"></div></section>
+        <section class="tab-view" data-tab="Loans"><div class="heading"><div><h1>Credit & Loans</h1><p>Bridge loan and debt prioritization</p></div></div><div class="grid" id="loanCards"></div></section>
+        <section class="tab-view" data-tab="Ops"><div class="heading"><div><h1>Shop-Floor Ops</h1><p>CRCA steel · CNC capacity · inventory</p></div></div><div class="grid" id="opsCards"></div></section>
+      </div>
+    </main>
+  </div>
+  <button class="fab" id="openChat">Ask MunimAI · Voice</button>
+  <section class="chat" id="chat" aria-label="Ask MunimAI"><div class="chat-head"><strong>Ask MunimAI</strong><button class="listen" id="closeChat">Close</button></div><div class="messages" id="messages"><div class="bubble">How can I help with your business today?</div></div><form class="compose" id="compose"><input id="question" placeholder="Ask about cash, GST, invoices or profit..." /><button type="submit">Send</button></form></section>
+  <script>
+    const inr=n=>`₹${Math.round(n).toLocaleString('en-IN')}`;
+    const seed={cash:485000,receivables:1420000,payables:1190000,taxVault:142000,todaySales:148000,todayExpenses:114500};
+    let state=JSON.parse(localStorage.getItem('munimai-html-demo')||'null')||{...seed};
+    const save=()=>localStorage.setItem('munimai-html-demo',JSON.stringify(state));
+    const tabs=['Overview','Legal','Credit & Loans','Shop-Floor Ops','Tax & GST'];
+    document.getElementById('nav').innerHTML=tabs.map((x,i)=>`<button class="nav-btn ${i===0?'active':''}" data-nav="${x}">${x}</button>`).join('');
+    function listen(text){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text.replace(/₹[\\d,]+/g,m=>m+' rupees'));u.lang='en-IN';const voices=speechSynthesis.getVoices();const female=/heera|neerja|veena|aditi|raveena|female/i;const excluded=/ravi|prabhat|rishi|male/i;const v=voices.find(v=>v.lang.toLowerCase()==='en-in'&&female.test(v.name)&&!excluded.test(v.name));if(v)u.voice=v;speechSynthesis.speak(u)}
+    speechSynthesis&&speechSynthesis.addEventListener?.('voiceschanged',()=>{});
+    function card(title,value,note,tone){return `<article class="card"><small>${title}</small><strong style="${tone?'color:'+tone:''}">${value}</strong><small>${note}</small><button class="listen" onclick="listen('${title}. ${value}. ${note}')">Listen</button></article>`}
+    function render(){
+      const forecast=state.cash+state.receivables-state.payables;
+      document.getElementById('kpis').innerHTML=card('Current Cash',inr(state.cash),'Available cash','')+card('Expected Receivables',inr(state.receivables),'12 expected invoices','var(--green)')+card('Upcoming Payables',inr(state.payables),'Due this month','var(--amber)')+card('Forecasted Cash',inr(forecast),'Cash after known flows',forecast>=0?'':'var(--red)');
+      document.getElementById('crunch').innerHTML=`<div><strong>Cash crunch status</strong><p>${state.payables>state.cash+state.receivables?'Payables exceed available cash and receivables.':'No cash-crunch risk in the next 15 days.'}</p></div><button class="listen" onclick="listen('${state.payables>state.cash+state.receivables?'Cash crunch warning':'No cash crunch risk'}')">Listen</button>`;
+      document.getElementById('activity').innerHTML='<div><span>Opening balance</span><strong>'+inr(state.cash)+'</strong></div><div><span>Today sales</span><strong>'+inr(state.todaySales)+'</strong></div><div><span>Today costs</span><strong>'+inr(state.todayExpenses)+'</strong></div>';
+      document.getElementById('taxKpis').innerHTML=card('GSTR-1 Sales','₹18,40,000','November outward supplies','')+card('GSTR-2B ITC','₹2,95,000','Available input tax credit','')+card('Net GST Payable','₹36,200','Reconcile mismatches before filing','var(--red)');
+      document.getElementById('itc').innerHTML=['Sri Venkateswara Steels · ₹1,24,000','Deccan Alloy & Kraft · ₹86,500','Telangana Machine Tools · ₹52,300','Godavari Packaging Co. · ₹74,800'].map((x,i)=>`<div class="tax-row"><span>${x}</span><span class="tag ${i===1||i===3?'red':'green'}">${i===1||i===3?'Mismatch':'Matched'}</span></div>`).join('');
+      document.getElementById('invoiceList').innerHTML=['Deccan Infra & Projects · ₹3,00,000 · Pending Acceptance','Secunderabad Engg Works · ₹1,80,000 · TReDS Eligible','Bharat Heavy Valves · ₹2,40,000 · 43B(h) Warning Zone','Telangana Aerospace · ₹2,80,000 · Critical Legal Cutoff','Kukatpally Auto Castings · ₹1,90,000 · ODR Ready'].map(x=>`<div class="tax-row"><span>${x}</span><button class="listen" onclick="listen('${x}')">Listen</button></div>`).join('');
+      document.getElementById('loanCards').innerHTML=card('Bridge Loan','₹1,50,000','Potential net gain ₹26,125','')+card('Bank Readiness','74 / 100','Amber · cleanup three red flags','var(--amber)')+card('Active Supplier Credit','₹2,10,000','78 days overdue','var(--red)');
+      document.getElementById('opsCards').innerHTML=card('Valve Housing Margin','12.9%','CRCA steel spike · below 15% safe threshold','var(--red)')+card('Skilled Operator Saving','₹27,300 / month','Replaces four helpers','var(--green)')+card('Finished Housings','340 units','Ready for dispatch','');
+    }
+    document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');const name=b.dataset.nav;document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));const key=name==='Tax & GST'?'Tax':name==='Credit & Loans'?'Loans':name==='Shop-Floor Ops'?'Ops':name;document.querySelector(`[data-tab="${key}"]`).classList.add('active')});
+    document.getElementBy(''); // no-op
+    document.getElementById('reset').onclick=()=>{state={...seed};save();render()};
+    document.getElementById('testVoice').onclick=()=>listen('MunimAI voice test. I am ready to help with your cash flow, GST and business questions.');
+    document.getElementById('stopVoice').onclick=()=>speechSynthesis?.cancel();
+    document.getElementById('openChat').onclick=()=>document.getElementById('chat').classList.toggle('open');
+    document.getElementById('closeChat').onclick=()=>document.getElementById('chat').classList.remove('open');
+    document.getElementById('compose').onsubmit=e=>{e.preventDefault();const input=document.getElementById('question'),q=input.value.trim();if(!q)return;const m=document.getElementById('messages');m.insertAdjacentHTML('beforeend',`<div class="bubble user"></div>`);m.lastElementChild.textContent=q;let answer='';const s=q.toLowerCase(); if(/cash|balance/.test(s))answer=`Current cash is ${inr(state.cash)}, receivables ${inr(state.receivables)}, payables ${inr(state.payables)} and forecasted cash ${inr(state.cash+state.receivables-state.payables)}.`;else if(/gst|tax|itc/.test(s))answer='GSTR-1 sales are ₹18,40,000, available ITC is ₹2,95,000 and net GST payable is ₹36,200.';else if(/profit|loss/.test(s))answer=`Today's sales are ${inr(state.todaySales)}, costs are ${inr(state.todayExpenses)}, and net profit is ${inr(state.todaySales-state.todayExpenses)}.`;else if(/stock|inventory/.test(s))answer='CRCA Steel Sheets: 4.2 tons, 6 days left, low stock. Brass Rods: 1.8 tons, 14 days left. Finished CNC Valve Housings: 340 units.';else if(/loan|emi/.test(s))answer='Active debts include a ₹4,20,000 Bajaj Finserv loan at 24 percent and a ₹3,50,000 SBI MUDRA loan at 10.5 percent.';else answer='Ask me about cash flow, GST, stock, profit, loans or overdue invoices.';m.insertAdjacentHTML('beforeend','<div class="bubble"></div>');m.lastElementChild.textContent=answer;input.value='';m.scrollTop=m.scrollHeight;if(window.speechSynthesis)listen(answer)};
+    render();
+  </script>
+</body>
+</html>
